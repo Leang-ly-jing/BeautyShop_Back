@@ -1,7 +1,6 @@
 <?php
 session_start();
 include 'components/connection.php';
-include 'components/alert.php';
 
 if (isset($_POST['logout'])) {
     session_destroy();
@@ -11,8 +10,10 @@ if (isset($_POST['logout'])) {
 
 $user_id = $_SESSION['user_id'] ?? '';
 
-$alert_msg = '';
-$alert_type = '';
+// Initialize alert arrays
+$success_msg = [];
+$warning_msg = [];
+$error_msg = [];
 
 // ADD TO CART
 if (isset($_POST['add_to_cart'])) {
@@ -88,69 +89,67 @@ if (isset($_POST['add_to_wishlist'])) {
         $warning_msg[] = 'Please log in to add items to your wishlist.';
     }
 }
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Beauty SkinCare - Shop Page</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Beauty SkinCare - Shop Page</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
-    <style type="text/css">
-        <?php include 'style.css'; ?>
-    </style>
+<link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+<style type="text/css">
+    <?php include 'style.css'; ?>
+</style>
 </head>
-
 <body>
-    <?php include 'components/header.php'; ?>
+<?php include 'components/header.php'; ?>
 
-    <div class="main">
-        <div class="banner">
-            <h1>Our Shop</h1>
-        </div>
-        <div class="title2">
-            <a href="home.php">home</a><span>/ our shop</span>
-        </div>
-        <section class="products">
-            <div class="box-container">
-                <?php
-                $result = $conn->query("SELECT * FROM products");
-                if ($result && $result->num_rows > 0) {
-                    while ($product = $result->fetch_assoc()) {
-                ?>
-                <form action="" method="post" class="box">
-                    <div class="btn">Buy Now</div>
-                    <img src="img/<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                    <div class="button-group">
-                        <button type="submit" name="add_to_cart" title="Add to Cart"><i class="bx bx-cart"></i></button>
-                        <button type="submit" name="add_to_wishlist" title="Add to Wishlist"><i class="bx bx-heart"></i></button>
-                        <a href="view_page.php?pid=<?= $product['id'] ?>" class="bx bxs-show" title="View Product"></a>
-                    </div>
-                    <h3 class="name"><?= htmlspecialchars($product['name']) ?></h3>
-                    <p class="price">price $<?= number_format($product['price'], 2) ?>/-</p>
-                    <div class="flex">
-                        <input type="number" name="qty" required min="1" value="1" max="99" maxlength="2" class="qty">
-                    </div>
-                    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                </form>
-                <?php
-                    }
-                } else {
-                    echo '<p class="empty">No products added yet!</p>';
-                }
-                ?>
-            </div>
-        </section>
-
-        <?php include 'components/footer.php'; ?>
+<div class="main">
+    <div class="banner">
+        <h1>Our Shop</h1>
     </div>
+    <div class="title2">
+        <a href="home.php">home</a><span>/ our shop</span>
+    </div>
+    <section class="products">
+        <div class="box-container">
+            <?php
+            $result = $conn->query("SELECT * FROM products");
+            if ($result && $result->num_rows > 0) {
+                while ($product = $result->fetch_assoc()) {
+            ?>
+            <form action="" method="post" class="box">
+                <div class="btn">Buy Now</div>
+                <img src="img/<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                <div class="button-group">
+                    <button type="submit" name="add_to_cart" title="Add to Cart"><i class="bx bx-cart"></i></button>
+                    <button type="submit" name="add_to_wishlist" title="Add to Wishlist"><i class="bx bx-heart"></i></button>
+                    <a href="view_page.php?pid=<?= $product['id'] ?>" class="bx bxs-show" title="View Product"></a>
+                </div>
+                <h3 class="name"><?= htmlspecialchars($product['name']) ?></h3>
+                <p class="price">price $<?= number_format($product['price'], 2) ?>/-</p>
+                <div class="flex">
+                    <input type="number" name="qty" required min="1" value="1" max="99" maxlength="2" class="qty">
+                </div>
+                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+            </form>
+            <?php
+                }
+            } else {
+                echo '<p class="empty">No products added yet!</p>';
+            }
+            ?>
+        </div>
+    </section>
 
-    <!-- SweetAlert2 JS -->
-    <script src="script.js"></script>
+    <?php include 'components/footer.php'; ?>
+</div>
+
+<!-- Include alert.php here so SweetAlert triggers -->
+<?php include 'components/alert.php'; ?>
+
+<script src="script.js"></script>
 </body>
-
 </html>
