@@ -44,8 +44,7 @@ if (isset($_POST['add_to_cart'])) {
                 $stmt_update->execute();
                 $stmt_update->close();
 
-                $alert_msg = 'Product quantity updated in your cart!';
-                $alert_type = 'success';
+                $success_msg[] = 'Product quantity updated in your cart!';
             } else {
                 $stmt->close();
                 $stmt_insert = $conn->prepare("INSERT INTO cart (user_id, product_id, price, qty) VALUES (?, ?, ?, ?)");
@@ -53,16 +52,13 @@ if (isset($_POST['add_to_cart'])) {
                 $stmt_insert->execute();
                 $stmt_insert->close();
 
-                $alert_msg = 'Product added to your cart!';
-                $alert_type = 'success';
+                $success_msg[] = 'Product added to your cart!';
             }
         } else {
-            $alert_msg = 'Invalid product price.';
-            $alert_type = 'error';
+            $error_msg[] = 'Invalid product price.';
         }
     } else {
-        $alert_msg = 'Please log in to add items to your cart.';
-        $alert_type = 'warning';
+        $warning_msg[] = 'Please log in to add items to your cart.';
     }
 }
 
@@ -70,36 +66,29 @@ if (isset($_POST['add_to_cart'])) {
 if (isset($_POST['add_to_wishlist'])) {
     if ($user_id != '') {
         $product_id = intval($_POST['product_id']);
-
         $stmt = $conn->prepare("SELECT id FROM wishlist WHERE user_id = ? AND product_id = ?");
         $stmt->bind_param("ii", $user_id, $product_id);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $alert_msg = 'Product already exists in your wishlist!';
-            $alert_type = 'warning';
+            $warning_msg[] = 'Product already exists in your wishlist!';
         } else {
             $stmt->close();
-
             $stmt_insert = $conn->prepare("INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)");
             $stmt_insert->bind_param("ii", $user_id, $product_id);
-
             if ($stmt_insert->execute()) {
-                $alert_msg = 'Product added to your wishlist!';
-                $alert_type = 'success';
+                $success_msg[] = 'Product added to your wishlist!';
             } else {
-                $alert_msg = 'Error adding product to wishlist.';
-                $alert_type = 'error';
+                $error_msg[] = 'Error adding product to wishlist.';
             }
             $stmt_insert->close();
         }
-        // $stmt->close();
     } else {
-        $alert_msg = 'Please log in to add items to your wishlist.';
-        $alert_type = 'warning';
+        $warning_msg[] = 'Please log in to add items to your wishlist.';
     }
 }
+
 ?>
 
 <!DOCTYPE html>
